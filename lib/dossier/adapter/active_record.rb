@@ -15,8 +15,8 @@ module Dossier
 
       def execute(query, report_name = nil)
         # Ensure that SQL logs show name of report generating query
-        self.transaction do
-          connection.execute("SET @previous=\"\";")
+        ::ActiveRecord::Base.transaction do
+          ::ActiveRecord::Base.execute("SET @previous=\"\";")
           Result.new(connection.exec_query(*["\n#{query}", report_name].compact))
         end
 
