@@ -6,7 +6,7 @@ module Dossier
 
       def initialize(options = {})
         self.options    = options
-        self.connection = options.delete(:connection) || active_record_connection
+        self.aconnection = options.delete(:connection) || active_record_connection
       end
 
       def escape(value)
@@ -15,11 +15,12 @@ module Dossier
 
       def execute(query, report_name = nil)
         # Ensure that SQL logs show name of report generating query
-        ::ActiveRecord::Base.transaction do
-          ::ActiveRecord::Base.connection.execute("SET @previous=\"\";")
-          Result.new(connection.exec_query(*["\n#{query}", report_name].compact))
+        Result.new(
+        self.aconnection.transaction do
+          aconnection.connection.execute("SET @previous=\"\";")
+          aconnection.connection.exec_query(*["\n#{query}", report_name].compact)
         end
-
+        )
       rescue => e
         raise Dossier::ExecuteError.new "#{e.message}\n\n#{query}"
       end
@@ -36,7 +37,7 @@ module Dossier
           end
         end
         @abstract_class.establish_connection(options)
-        @abstract_class.connection
+        @abstract_class
       end
 
     end
