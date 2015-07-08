@@ -2,11 +2,11 @@ module Dossier
   module Adapter
     class ActiveRecord
 
-      attr_accessor :options, :connection
+      attr_accessor :options, :connection, :aconnection
 
       def initialize(options = {})
         self.options    = options
-        self.aconnection = options.delete(:connection) || active_record_connection
+        @aconnection = options.delete(:connection) || active_record_connection
       end
 
       def escape(value)
@@ -16,9 +16,9 @@ module Dossier
       def execute(query, report_name = nil)
         # Ensure that SQL logs show name of report generating query
         Result.new(
-        self.aconnection.transaction do
-          aconnection.connection.execute("SET @previous=\"\";")
-          aconnection.connection.exec_query(*["\n#{query}", report_name].compact)
+        @aconnection.transaction do
+          @aconnection.connection.execute("SET @previous=\"\";")
+          @aconnection.connection.exec_query(*["\n#{query}", report_name].compact)
         end
         )
       rescue => e
