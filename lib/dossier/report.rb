@@ -51,6 +51,10 @@ module Dossier
       tap { execute }
     end
 
+    def get_header
+      header.to_s
+    end
+
     def format_header(header)
       formatter.titleize(header.to_s)
     end
